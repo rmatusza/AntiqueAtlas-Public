@@ -1,0 +1,22 @@
+[
+    {
+        "value": 275000,
+        "material": ["steel", "leather"],
+        "bladeLength": 59.25,
+        "bladeType": "straight, double-edged claymore",
+        "hiltMaterial": ["metal", "leather"],
+        "condition": "Very Good to Fine (studio distressed, production use)",
+        "restorationStatus": "Original (film production piece, no restoration)",
+        "completeness": "full sword with leather sheath and sling",
+        "era": "Modern (1995 film prop, Braveheart)",
+        "regionCulture": "Scottish (cinematic representation)",
+        "makerWorkshop": ["Simon Atherton (Armorer)"],
+        "provenance": [
+        "Film prop used by Mel Gibson as William Wallace in Braveheart (Paramount, 1995)",
+        "Sold through Heritage Auctions with Certificate of Authenticity"
+        ],
+        "rarity": "Unique (hero screen-used film prop)",
+        "scabbard": "leather sheath with sling (original to prop)",
+        "ornamentation": "simple, distressed leather accents and wrapping (studio applied for realism)"
+    }
+]

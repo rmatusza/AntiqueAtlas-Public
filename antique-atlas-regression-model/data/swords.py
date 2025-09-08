@@ -1,0 +1,242 @@
+swords = [
+    {
+        'value': 1673000,
+        'material': ['silver', 'gold', 'steel'],
+        'bladeLength': 33,  # inches
+        'bladeType': 'straight, single-edged presentation blade',
+        'hiltMaterial': ['silver', 'gold'],
+        'condition': 'Excellent',
+        'restorationStatus': 'Original',
+        'completeness': 'full sword in original fitted presentation case',
+        'era': 'American Civil War (1864)',
+        'regionCulture': 'American (United States)',
+        'makerWorkshop': ['Henry Folsom (St. Louis silversmith & jeweler)'],
+        'provenance': [
+            'Ulysses S. Grant (presented by citizens of Kentucky, 1864–1885)',
+            'Grant Family (1885–1960s)',
+            'Jay Altmeyer (1960s–1989; sold in 1989 for then-world record price)',
+            'Donald Tharpe (1989–present; Tharpe Collection of American Military History)'
+        ],
+        'rarity': 'Unique',
+        'scabbard': 'unknown',
+        'ornamentation': 'elaborate: 26 mine-cut diamonds forming “U.S.G.” over a large amethyst with gold sunburst; silver grip as goddess Victory; American eagle pommel; intricately etched/engraved blade with battle scenes; original ivory-mounted black japanned fitted presentation case'
+    },
+    {
+        'value': 275000,
+        'material': ['steel', 'leather'],
+        'bladeLength': 59.25,  # inches (overall sword length, blade portion not separately given)
+        'bladeType': 'straight, double-edged claymore',
+        'hiltMaterial': ['metal', 'leather'],
+        'condition': 'Very Good to Fine (studio distressed, production use)',
+        'restorationStatus': 'Original (film production piece, no restoration)',
+        'completeness': 'full sword with leather sheath and sling',
+        'era': 'Modern (1995 film prop, Braveheart)',
+        'regionCulture': 'Scottish (cinematic representation)',
+        'makerWorkshop': ['Simon Atherton (Armorer)'],
+        'provenance': [
+            'Film prop used by Mel Gibson as William Wallace in Braveheart (Paramount, 1995)',
+            'Sold through Heritage Auctions with Certificate of Authenticity'
+        ],
+        'rarity': 'Unique (hero screen-used film prop)',
+        'scabbard': 'leather sheath with sling (original to prop)',
+        'ornamentation': 'simple, distressed leather accents and wrapping (studio applied for realism)'
+    },
+    {
+        'value': 210000,
+        'material': ['steel', 'silver', 'silver gilt', 'brass'],
+        'bladeLength': 30.5,  # inches
+        'bladeType': 'slightly curved, single-edged with fuller',
+        'hiltMaterial': ['silver', 'silver gilt'],
+        'condition': 'Excellent to Mint (minor blemishes, patina, shallow dent on scabbard mount)',
+        'restorationStatus': 'Original',
+        'completeness': 'full sword with gilt brass scabbard and presentation plaque',
+        'era': 'American Civil War (1862)',
+        'regionCulture': 'Confederate (Louisiana, United States)',
+        'makerWorkshop': ['Thomas Griswold (attributed, New Orleans)'],
+        'provenance': [
+            'Presented to Brig. Gen. Christopher H. Mott by the Jeff Davis Rifles, March 28, 1862',
+            'General Christopher H. Mott (killed in action May 5, 1862, Battle of Williamsburg)'
+        ],
+        'rarity': 'Unique (highest grade Confederate officer’s sword in private hands)',
+        'scabbard': 'gilt brass scabbard with pierced silver gilt mounts and inscribed silver plaque',
+        'ornamentation': 'elaborate: eaglehead pommel; silver gilt grip with relief symbols (skull & crossbones, shield, cannons, flaming bomb, flags); pierced guard with Louisiana seal, pelican, eagle, Confederate flags, and military motifs; delicately etched blade with floral scrolls, cannons, flags, “Genl C. H. Mott” inscription; gilt brass scabbard with decorated mounts and inscribed plaque'
+    },
+    {
+        'value': 155350,
+        'material': ['steel', 'brass', 'fish skin', 'leather'],
+        'bladeLength': 29.625,  # inches
+        'bladeType': 'straight, double-edged naval officer’s sword',
+        'hiltMaterial': ['brass', 'fish skin', 'brass wire'],
+        'condition': 'Excellent (superb preservation, original storage case, minor wear consistent with age)',
+        'restorationStatus': 'Original',
+        'completeness': 'full sword with original brass-mounted black leather scabbard and fitted oil cloth storage case',
+        'era': 'American Civil War (1861–1865)',
+        'regionCulture': 'Confederate (Naval, Virginia/England production)',
+        'makerWorkshop': ['Firmin & Sons, London'],
+        'provenance': [
+            'Commander William Lewis Maury, C.S. Navy (commissioned 1861, sword inscribed with his name, used during service on C.S.S. Georgia)',
+            'Lineal descendants of Maury',
+            'Donald Tharpe (Tharpe Collection of American Military History)'
+        ],
+        'rarity': 'Exceedingly Rare (few known Confederate naval dolphin-head swords, unique with storage case)',
+        'scabbard': 'original brass-mounted black leather scabbard with rope-knot ring mounts and serpent-decorated drag',
+        'ornamentation': 'elaborate: dolphin head pommel with engraved scales; brass guard with relief cotton and tobacco plants, crossed cannons, fouled anchor (Confederate Navy insignia); etched blade with Confederate flag, anchor, cotton/tobacco, floral motifs, “Proof” medallion; rope-knot ring mounts and serpent drag on scabbard; original padded oil cloth storage case'
+    },
+    {
+        'value': 93750,
+        'material': ['steel', 'brass', 'leather', 'tin'],
+        'bladeLength': 37.5,  # inches
+        'bladeType': 'curved, single-edged kilij-style with yelman (flared false edge)',
+        'hiltMaterial': ['brass', 'leather'],
+        'condition': 'Excellent (original hilt and grip, blade grey with visible etchings, scabbard complete and intact with patina)',
+        'restorationStatus': 'Partially Restored (leather scabbard restored, otherwise original)',
+        'completeness': 'full sword with original scabbard',
+        'era': 'American Civil War (1862)',
+        'regionCulture': 'Confederate (Texas, United States)',
+        'makerWorkshop': ['J.C. Wilson, Houston'],
+        'provenance': [
+            'Custom made for Confederate general’s grade, signed by J.C. Wilson, Houston',
+            'One of only three known maker-marked Wilson swords, unique example'
+        ],
+        'rarity': 'Unique (finest and rarest Texas general’s grade Confederate sword)',
+        'scabbard': 'tin-covered leather scabbard with large brass mounts, middle mount with rings, and brass drag',
+        'ornamentation': 'elaborate: brass basket hilt with floral work, large “C.S.” block letters, Texas star medallion, lion/bear-shaped quillon; blade deeply etched with crossed cannons, rammers, and halberds; domed pommel with perimeter line; wide scabbard with brass fittings'
+    },
+    {
+        'value': 83650,
+        'material': ['steel', 'brass', 'wood'],
+        'bladeLength': None,  # not explicitly given, etched to within 7.5" of the tip
+        'bladeType': 'straight, double-edged staff/foot officer’s sword',
+        'hiltMaterial': ['wood', 'brass (gilt)', 'brass wire'],
+        'condition': 'Very Good (blade loose due to missing washer, otherwise retains gilt and engraving, well-preserved)',
+        'restorationStatus': 'Original (no known restoration)',
+        'completeness': 'full sword with original engraved brass scabbard',
+        'era': 'American Civil War (1862)',
+        'regionCulture': 'Confederate (Georgia, United States)',
+        'makerWorkshop': ['E. J. Johnston & Co., Macon, Georgia'],
+        'provenance': [
+            'Presented to Lt. Col. W. B. Betts, 13th Alabama Infantry, 1862',
+            'Descended in the Betts family since the Civil War (first time on market)'
+        ],
+        'rarity': 'Unique (extraordinary presentation sword, only known engraved brass scabbard of its type by Johnston)',
+        'scabbard': 'brass scabbard, profusely engraved with floral motifs, eagle rising from flames, “CS” and “US,” and Confederate First National flags',
+        'ornamentation': 'elaborate: gilt brass hilt with wire-wrapped wood grip; etched blade with floral designs, Confederate flags, crossed cannons, muskets, halberds, pikes; engraved brass scabbard with eagle, stars, flames, and Confederate symbols; presentation inscription to Betts'
+    },
+    {
+        'value': 62500,
+        'material': ['steel', 'brass', 'ivory'],
+        'bladeLength': 33,  # inches
+        'bladeType': 'curved, single-edged saber',
+        'hiltMaterial': ['ivory', 'brass'],
+        'condition': 'Good (age wear, repairs to handle/blade joint, patina on scabbard, bluing/gilding 70–80% preserved)',
+        'restorationStatus': 'Repaired (handle and blade reattached)',
+        'completeness': 'full sword with heavily decorated brass-plated scabbard',
+        'era': 'Early 19th century (c. 1810–1815, War of 1812 period)',
+        'regionCulture': 'French-American (New Orleans, Barataria pirates)',
+        'makerWorkshop': ['Unknown (possibly French or New Orleans maker)'],
+        'provenance': [
+            'Attributed to Jean Lafitte, French pirate and privateer',
+            'Purchased by Mrs. Larz Anderson in 1916 from Armand Hawkins Co., New Orleans',
+            'Part of Anderson House / Society of the Cincinnati collection (1938)',
+            'Exhibited Louisiana State Museum at the Cabildo, 1957',
+            'Multiple publications and bills of sale documenting attribution'
+        ],
+        'rarity': 'Unique (historic pirate-attributed weapon with documented museum and private ownership)',
+        'scabbard': 'brass-plated, heavily decorated scabbard with raised motifs, bumps and bruises, patina, moderate bend at throat',
+        'ornamentation': 'elaborate: blued and gilt upper blade with engraved motifs; neoclassical head guard; checkered ivory grip; cast brass guard and butt; scabbard with raised gilt decorations and motifs, marked “6A” in red'
+    },
+    {
+        'value': 55000,
+        'material': ['tamahagane steel', 'gold (cutting test inlay)'],
+        'bladeLength': 72.5,  # cm
+        'bladeType': 'katana, shinogi-zukuri with wide complex notare hamon',
+        'hiltMaterial': [],  # in shirasaya mount, not traditional koshirae
+        'condition': 'Excellent (full bright polish, flawless hada, pristine nakago, no kizu)',
+        'restorationStatus': 'Original (shirasaya storage mounting, no modern alterations)',
+        'completeness': 'full katana blade in shirasaya with sayagaki and NBTHK certification',
+        'era': 'Shinto period (early Edo, 17th century Japan)',
+        'regionCulture': 'Japanese',
+        'makerWorkshop': ['Masateru (Chu-jo-saku)', 'Kaneshige (Jo-saku)', 'Kanetsune'],
+        'provenance': [
+            'NBTHK Juyo certificate',
+            'Cutting test in gold inlay (partially missing stroke)',
+            'Sayagaki on shirasaya attributing and documenting blade'
+        ],
+        'rarity': 'Unique (very rare triple maker signed katana with original cutting test)',
+        'scabbard': 'shirasaya with elaborate sayagaki and cat-scratch gold foil fittings',
+        'ornamentation': 'elaborate: wide complex notare hamon, flawless itame hada, gold-inlaid cutting test inscription, triple signature (Kaneshige, Masateru, Kanetsune)'
+    },
+    {
+        'value': 3750,
+        'material': ['tamahagane steel', 'wood', 'metal fittings', 'lacquer'],
+        'bladeLength': 99.1,  # cm overall, blade length not separately given
+        'bladeType': 'katana, shin shinto period, mounted in efu-no-dachi tachi style',
+        'hiltMaterial': ['wood (tsuka)', 'metal fittings'],
+        'condition': 'Good (wear consistent with age and handling; pushes and pin dents to scabbard)',
+        'restorationStatus': 'Original (no mention of modern restoration)',
+        'completeness': 'full sword with tachi-style mounts and scabbard',
+        'era': 'Shin Shinto period (19th century, Japan)',
+        'regionCulture': 'Japanese',
+        'makerWorkshop': ['unknown'],
+        'provenance': [
+            'Auctioned through Heritage Auctions',
+            'Mounted in 19th century Kamakura-style efu-no-dachi tachi mounts'
+        ],
+        'rarity': 'Rare (Shin Shinto katana in elaborate Kamakura-style mounts)',
+        'scabbard': '19th century lacquered tachi scabbard with pushes and pin dents',
+        'ornamentation': 'decorative Kamakura-style efu-no-dachi tachi mounts; traditional fittings with aged patina'
+    },
+    {
+        'value': 1500,
+        'material': ['tamahagane steel', 'wood', 'metal fittings', 'painted steel scabbard'],
+        'bladeLength': 25.75,  # inches
+        'bladeType': 'katana, shinogi-zukuri, WWII guntō mount',
+        'hiltMaterial': ['wood (tsuka, covered)', 'metal fittings'],
+        'condition': 'Very Good (bright blade with pinprick pitting, scabbard 90% paint intact, lock catch loose, tang with uniform red rust)',
+        'restorationStatus': 'Original (no noted restoration, standard WWII service wear)',
+        'completeness': 'full sword with scabbard and WWII military mounts',
+        'era': 'World War II (1939–1945)',
+        'regionCulture': 'Japanese',
+        'makerWorkshop': ['signed blade (not translated)'],
+        'provenance': [
+            'Standard WWII Japanese officer’s guntō mount configuration',
+            'Auction listing (Heritage Auctions)'
+        ],
+        'rarity': 'Common to Uncommon (signed blades add collector significance)',
+        'scabbard': 'olive brown painted steel scabbard (90% finish, some carry wear, lock catch adjustment needed)',
+        'ornamentation': 'cloudy temper line (hamon), signed tang, standard WWII officer mounts'
+    },
+    {
+        "value": 7812,
+        "material": ["tamahagane steel", "wood (honoki shirasaya)", "gold (foil-wrapped habaki)"],
+        "bladeLength": 54, 
+        "bladeType": "wakizashi, thick notare hamon, exaggerated mokume hada with ji-nie",
+        "hiltMaterial": ["wood (honoki shirasaya)"],
+        "condition": "Excellent (in almost full polish, all details visible, extremely minor spider rust, no kizu, nakago perfect with patination and crisp kiku mon)",
+        "restorationStatus": "Original (no noted restoration)",
+        "completeness": "full sword in honoki wood shirasaya with sayagaki",
+        "era": "Shinto period (17th century, Edo era)",
+        "regionCulture": "Japanese",
+        "makerWorkshop": ["Inoue Shinkai (signed, dated, with kiku mon)"],
+        "provenance": [
+            "Sayagaki attesting authenticity",
+            "High grade kante-sho authentication from NTHK",
+            "Reference: Fujishiro book (rated sai jo saku – highest rating for Shinto smiths)"
+        ],
+        "rarity": "Fine and Rare (Shinkai is one of only a handful of shinto smiths awarded sai jo saku)",
+        "scabbard": "plain honoki wood shirasaya (storage mount, not combat mount)",
+        "ornamentation": "thick notare hamon, exaggerated mokume hada with ji-nie, signed ubu nakago with kiku mon, gold foil-wrapped habaki"
+    },
+]
+
+'''
+A Fine and Rare Signed and Dated Wakizashi by Inoue Shinkai.
+
+The blade with 54 cm cutting edge and thick notare hamon. Exaggerated mokume hada shot through with ji-nie. 
+Ubu nakago with one mekugi-ana signed Inoue Shinkai dated with kiku mon. 
+Condition of blade, in almost full polish with all details visible and some extremely minor spider rust. N
+o kizu. Nagako rates perfect with patination and crisp kiku mon. Gold foil wrapped habaki. 
+In honoki wood shirasaya with sayagaki attesting to authenticity. 
+Shinkai is only one of a handful of shinto swordsmiths awarded the highest rating, sai jo saku in the Fujishiro book. 
+With high grade kante-sho authentication from NTHK. 
+'''
