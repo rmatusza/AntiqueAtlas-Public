@@ -1,6 +1,37 @@
 import { formatDateString } from '../functions/util.jsx';
 import { LightboxGallery } from '../UI/LightboxGallery.jsx';
 
+/**
+ * ItemCard
+ * Reusable, accessible card for displaying an item with images (via LightboxGallery)
+ * and arbitrary details below.
+ *
+ * Props:
+ *  - images: Array<{ src: string; alt?: string }>
+ *  - title: string
+ *  - subtitle?: string
+ *  - price?: string | number
+ *  - badges?: Array<{ label: string; tone?: "indigo"|"green"|"rose"|"slate"|"amber" }>
+ *  - attributes?: Array<{ label: string; value: string }>
+ *  - description?: string
+ *  - actions?: Array<{ label: string; onClick?: () => void; href?: string; variant?: "primary"|"ghost" }>
+ *  - footer?: React.ReactNode
+ *  - className?: string
+ *  - onCardClick?: () => void  (optional click on the whole card)
+ *
+ * Usage example:
+ *  <ItemCard
+ *    images={[{src:"https://.../1.jpg", alt:"Front"},{src:"https://.../2.jpg"}]}
+ *    title="Vintage Camera"
+ *    subtitle="Fujica ST801 (1972)"
+ *    price="$129"
+ *    badges={[{label:"Vintage", tone:"amber"},{label:"Tested", tone:"green"}]}
+ *    attributes={[{label:"Condition", value:"Good"},{label:"Shutter", value:"Working"}]}
+ *    description="A classic 35mm SLR with TTL metering..."
+ *    actions={[{label:"Add to cart", onClick:()=>{}},{label:"Details", href:"/items/123", variant:"ghost"}]}
+ *  />
+ */
+
 export function Item({
   bidCloseDateTime,
   bidCount,
@@ -86,6 +117,7 @@ export function Item({
           )}
         </div>
 
+        {/* Badges */}
         {/* {badges?.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {badges.map((b, i) => (
@@ -99,6 +131,7 @@ export function Item({
           </div>
         )} */}
 
+        {/* Attributes grid */}
         {/* {attributes?.length > 0 && (
           <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm sm:grid-cols-3">
             {attributes.map((attr, i) => (
@@ -110,10 +143,12 @@ export function Item({
           </dl>
         )} */}
 
+        {/* Description */}
         {description && (
           <p className="line-clamp-3 text-sm leading-6 text-slate-700">{description}</p>
         )}
 
+        {/* Actions */}
         {/* {actions?.length > 0 && (
           <div className="mt-1 flex flex-wrap gap-2">
             {actions.map((a, i) => (
@@ -143,6 +178,7 @@ export function Item({
           </div>
         )} */}
 
+        {/* Footer (custom node) */}
         {/* {footer && <div className="pt-2 text-sm text-slate-500">{footer}</div>} */}
       </div>
     </article>

@@ -1,4 +1,46 @@
 from __future__ import annotations
+
+"""
+MultiLabelBinarizer transformer for sklearn Pipelines.
+
+Purpose
+-------
+Turn list-like categorical columns (e.g., ["gold", "silver"]) into a stable set
+of binary indicator features suitable for linear/regularized regression.
+
+Key features
+------------
+- Learns a fixed vocabulary on train (top-K or min frequency capping)
+- Optional "Other" bucket for unseen/rare tokens
+- Robust to nulls/non-iterables/duplicates per row
+- Sklearn-compatible (fit/transform, get_feature_names_out)
+- Returns a pandas DataFrame by default (named columns), or a scipy sparse matrix
+
+Example
+-------
+>>> import pandas as pd
+>>> X = pd.DataFrame({
+...     "material": [["gold", "silver"], ["steel"], None, ["gold", "steel", "steel"]],
+... })
+>>> tf = MultiLabelBinarizerTransformer(
+...     feature_name="material",
+...     top_k=2,
+...     include_other=True,
+... )
+>>> tf.fit(X["material"])  # learns vocab: ["gold", "steel"] (assuming freq)
+>>> Z = tf.transform(X["material"])  # DataFrame with columns material__gold, material__steel, material__Other
+
+Integration in ColumnTransformer
+--------------------------------
+- Use one instance per multi-label column.
+- Wrap with a FunctionTransformer if your column needs pre-normalization.
+
+Notes
+-----
+- If both top_k and min_freq are provided, top_k takes precedence.
+- If neither is provided, the vocabulary is the set of all observed tokens (not recommended for very high-cardinality columns).
+"""
+
 from dataclasses import dataclass
 from typing import Callable, Iterable, List, Optional, Sequence, Set, Tuple
 
@@ -18,6 +60,7 @@ except Exception:  # pragma: no cover - scipy optional at runtime
 # ------------------------------
 
 def _default_normalizer(token: str) -> str:
+    """Default token normalizer: strip and lower. Safe for None guarding upstream."""
     return token.strip().lower()
 
 # data cleaning / normalization utility
@@ -27,6 +70,13 @@ def _default_normalizer(token: str) -> str:
 # - Removes duplicates automatically.
 # - Supports pluggable normalization (lowercasing, stemming, etc.).
 def _as_token_set(value: object, normalizer: Optional[Callable[[str], str]]) -> Set[str]:
+    """Convert a row value into a *set* of normalized tokens.
+
+    - None / NaN / non-iterables => empty set
+    - Strings => single-token set {normalized(string)}
+    - Iterables of strings => normalized unique tokens
+    - Duplicates within a row are collapsed via set
+    """
     if value is None or (isinstance(value, float) and np.isnan(value)):
         return set()
 
@@ -72,7 +122,38 @@ class _VocabConfig:
 #               1 if that row has the category/token.
 #               0 if it does not.
 class MultiLabelBinarizerTransformer(BaseEstimator, TransformerMixin):
-    
+    """
+    Scikit-learn compatible transformer for multi-label categorical columns.
+
+    Parameters
+    ----------
+    feature_name : str
+        Prefix used to build output column names (e.g., "material").
+    top_k : Optional[int], default=None
+        Keep only the K most frequent tokens across the training data.
+        If None, disabled. If both top_k and min_freq are provided, top_k wins.
+    min_freq : Optional[int], default=None
+        Keep tokens appearing at least this many times across training data.
+        Ignored if top_k is provided.
+    include_other : bool, default=True
+        If True, aggregate any rare/unseen tokens at transform-time into a single
+        "Other" indicator column.
+    normalizer : Optional[Callable[[str], str]], default=_default_normalizer
+        Function to normalize tokens (e.g., lowercasing, trimming). Use None to disable.
+    sparse_output : bool, default=False
+        If True, return a scipy.sparse CSR matrix. If True but SciPy is not available,
+        falls back to dense DataFrame.
+    dtype : str or numpy.dtype, default=np.uint8
+        Output dtype for indicators.
+
+    Attributes
+    ----------
+    vocabulary_ : Tuple[str, ...]
+        Learned, fixed vocabulary of kept tokens.
+    feature_names_out_ : Tuple[str, ...]
+        Full list of output feature names in transform() result.
+    """
+
     def __init__(
         self,
         feature_name: str,
@@ -109,7 +190,15 @@ class MultiLabelBinarizerTransformer(BaseEstimator, TransformerMixin):
     # 5. Build output column names like material__gold, material__silver, etc.
     # 6. Optionally add material__Other.
     def fit(self, X: Sequence[object], y: Optional[Sequence] = None):
-       
+        """Learn the vocabulary from the training column.
+
+        Parameters
+        ----------
+        X : Sequence[object]
+            A 1D sequence (e.g., pandas Series) where each element is list-like of strings
+            (or a single string, or None).
+        y : ignored
+        """
         # Flatten tokens across rows, count frequencies
         token_counts: dict[str, int] = {}
         for value in X:
@@ -155,7 +244,19 @@ class MultiLabelBinarizerTransformer(BaseEstimator, TransformerMixin):
     #       Sparse CSR matrix (if sparse_output=True).
     #       pandas DataFrame with column names (default).
     def transform(self, X: Sequence[object]):
-        
+        """Transform the column into binary indicator features.
+
+        Parameters
+        ----------
+        X : Sequence[object]
+            A 1D sequence (e.g., pandas Series) where each element is list-like of strings
+            (or a single string, or None).
+
+        Returns
+        -------
+        pandas.DataFrame or scipy.sparse.csr_matrix
+            Indicator matrix with columns matching get_feature_names_out().
+        """
         check_is_fitted(self, attributes=["vocabulary_", "feature_names_out_", "_cfg"])
 
         vocab_index = {t: i for i, t in enumerate(self._cfg.vocabulary_)}
@@ -212,6 +313,7 @@ class MultiLabelBinarizerTransformer(BaseEstimator, TransformerMixin):
     # Introspection helpers
     # ------------------------------
     def get_feature_names_out(self, input_features: Optional[Iterable[str]] = None) -> np.ndarray:
+        """Names of output features (sklearn API)."""
         check_is_fitted(self, attributes=["feature_names_out_"])
         return np.array(self.feature_names_out_, dtype=object)
 

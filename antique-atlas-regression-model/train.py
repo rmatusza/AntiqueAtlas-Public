@@ -1,3 +1,27 @@
+"""
+train.py — Train the swords valuation pipeline and persist artifacts.
+
+What it does
+------------
+- Loads training and (optionally) validation data from /data.
+- Builds the preprocessing+regression pipeline from pipeline.py.
+- Fits on train; evaluates on val (or a split from train if val not supplied).
+- Saves the fitted pipeline to /artifacts/pipeline.joblib.
+- Writes basic metrics (MAE, RMSE, R^2) to /artifacts/metrics.json.
+
+Usage
+-----
+python -m src.train \
+  --train data/swords_train.parquet \
+  --val data/swords_val.parquet \
+  --out artifacts/pipeline.joblib \
+  --metrics artifacts/metrics.json
+
+Notes
+-----
+- Target is expected to be raw price in dollars; the pipeline handles log transform internally.
+- If you only have a single dataset, omit --val and pass --val-split 0.2 to split off validation.
+"""
 from __future__ import annotations
 
 import argparse
@@ -9,9 +33,10 @@ from typing import Any, Dict, Tuple
 import joblib
 import numpy as np
 import pandas as pd
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.metrics import mean_absolute_error, root_mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 
+# from .pipeline import DEFAULT_CONFIG, build_pipeline
 from .pipeline import DEFAULT_CONFIG, build_pipeline
 
 
@@ -37,7 +62,7 @@ def _split_train_val(df: pd.DataFrame, target_col: str, val_size: float, random_
 
 def _eval_metrics(y_true: pd.Series, y_pred: np.ndarray) -> Dict[str, float]:
     mae = float(mean_absolute_error(y_true, y_pred))
-    rmse = float(mean_squared_error(y_true, y_pred, squared=False))
+    rmse = float(root_mean_squared_error(y_true, y_pred))
     r2 = float(r2_score(y_true, y_pred))
     return {"MAE": mae, "RMSE": rmse, "R2": r2}
 
@@ -124,3 +149,7 @@ def main(argv: list[str] | None = None) -> None:
 
 if __name__ == "__main__":
     main()
+
+
+# USE THIS COMMAND FROM THE PARENT FOLDER:
+# python -m antique-finder-regression-model.train --train antique-finder-regression-model/swords.parquet --val-split 0.1

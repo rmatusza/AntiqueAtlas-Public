@@ -1,3 +1,22 @@
+"""
+evaluate.py — Evaluate a trained pipeline on a held-out test set.
+
+What it does
+------------
+- Loads a serialized sklearn Pipeline artifact (preprocess + model).
+- Loads a test dataset (Parquet/CSV), separates features/target.
+- Produces evaluation metrics (MAE, RMSE, R^2) on the test set.
+- Optionally saves per-row errors and simple diagnostic summaries.
+- Merges results into artifacts/metrics.json (or a provided path).
+
+Usage
+-----
+python -m src.evaluate \
+  --model artifacts/pipeline.joblib \
+  --test data/swords_test.parquet \
+  --metrics artifacts/metrics.json \
+  --errors artifacts/test_errors.csv
+"""
 from __future__ import annotations
 
 import argparse

@@ -3,6 +3,7 @@ import { createPool } from 'mysql2/promise';
 
 dotenv.config();
 
+// Create a connection pool using env variables
 export const pool = createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,

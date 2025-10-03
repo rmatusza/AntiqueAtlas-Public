@@ -1,3 +1,19 @@
+"""
+pipeline.py — Build the end-to-end preprocessing + regression pipeline.
+
+Purpose
+-------
+- Define a single sklearn Pipeline that:
+  (1) preprocesses numeric, single-categorical, and multi-categorical features,
+  (2) fits a regularized linear model on log-transformed target,
+  (3) returns predictions in dollars (inverse-transformed).
+
+Public API
+----------
+- build_pipeline(config) -> sklearn.Pipeline
+- get_feature_names(pipeline, X_sample: pd.DataFrame) -> list[str]
+- DEFAULT_CONFIG: dict[str, Any]
+"""
 from __future__ import annotations
 
 from typing import Any, Dict, List, Tuple
@@ -11,7 +27,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler, FunctionTransformer
 
 # Import our custom multi-label transformer
-from transformers.multilabel_binarizer import MultiLabelBinarizerTransformer
+from .transformers.multilabel_binarizer import MultiLabelBinarizerTransformer
 
 
 # ------------------------------
@@ -67,31 +83,37 @@ def _make_single_cat_pipeline() -> Pipeline:
     )
 
 
-def _series_selector(col_name: str) -> FunctionTransformer:
-    def _select(X: pd.DataFrame | np.ndarray):
-        # If we got a DataFrame (usual with ColumnTransformer), select by name
-        if isinstance(X, pd.DataFrame):
-            # X typically has only `col_name` in columns here
-            if col_name in X.columns:
-                return X[col_name]
-            # fallback: first column
-            return X.iloc[:, 0]
-        # If we got a numpy array of shape (n,1), squeeze to 1D
-        if isinstance(X, np.ndarray):
-            if X.ndim == 2 and X.shape[1] == 1:
-                return pd.Series(X[:, 0], index=pd.RangeIndex(len(X)))
-            # Already 1D
-            return pd.Series(X, index=pd.RangeIndex(len(X)))
-        # Last resort: try to wrap as Series
-        return pd.Series(X)
+# --- Top-level function: pickle-safe ---
+def select_series(X: pd.DataFrame | np.ndarray, col_name: str) -> pd.Series:
+    """
+    Return a 1D Series for the given column name from a DataFrame or 2D array.
+    This mirrors the behavior of your previous closure but is pickle-safe.
+    """
+    if isinstance(X, pd.DataFrame):
+        if col_name in X.columns:
+            return X[col_name]
+        return X.iloc[:, 0]  # fallback: first column
+    if isinstance(X, np.ndarray):
+        if X.ndim == 2 and X.shape[1] == 1:
+            return pd.Series(X[:, 0], index=pd.RangeIndex(len(X)))
+        return pd.Series(X, index=pd.RangeIndex(len(X)))
+    return pd.Series(X)
 
-    return FunctionTransformer(_select, validate=False, feature_names_out="one-to-one")
 
 
 def _make_multilabel_pipeline(field_name: str, **opts) -> Pipeline:
+    """Multi-label branch for one field: select Series -> MultiLabelBinarizerTransformer."""
     return Pipeline(
         steps=[
-            ("select", _series_selector(field_name)),
+            (
+                "select",
+                FunctionTransformer(
+                    select_series,
+                    kw_args={"col_name": field_name},
+                    validate=False,
+                    feature_names_out="one-to-one",
+                ),
+            ),
             (
                 "mlb",
                 MultiLabelBinarizerTransformer(
@@ -104,6 +126,7 @@ def _make_multilabel_pipeline(field_name: str, **opts) -> Pipeline:
 
 
 def _make_column_transformer(config: Dict[str, Any]) -> ColumnTransformer:
+    """Compose numeric/single-cat/multi-cat branches into one ColumnTransformer."""
     transformers: List[Tuple[str, Pipeline, List[str] | str]] = []
 
     numeric_cols: List[str] = config.get("numeric_cols", [])
@@ -130,6 +153,11 @@ def _make_column_transformer(config: Dict[str, Any]) -> ColumnTransformer:
 
 
 def _make_regressor(config: Dict[str, Any]) -> TransformedTargetRegressor:
+    """
+    Create the core regressor wrapped with log/exp transforms on the target.
+
+    Currently uses RidgeCV. Swap to ElasticNetCV in the future via config.
+    """
     model_conf = config.get("model", {})
     model_type = model_conf.get("type", "ridge").lower()
 
@@ -153,6 +181,15 @@ def _make_regressor(config: Dict[str, Any]) -> TransformedTargetRegressor:
 # ------------------------------
 
 def build_pipeline(config: Dict[str, Any] = DEFAULT_CONFIG) -> Pipeline:
+    """
+    Build the full sklearn Pipeline:
+      ColumnTransformer(preprocessing) -> TransformedTargetRegressor(model)
+
+    Notes:
+      - The returned Pipeline expects X as a pandas DataFrame WITHOUT the target column,
+        and y as a 1D array/Series of raw prices in dollars.
+      - Predictions are returned in dollars (inverse-transformed from log space).
+    """
     ct = _make_column_transformer(config)
     reg = _make_regressor(config)
     pipe = Pipeline(steps=[
@@ -163,6 +200,14 @@ def build_pipeline(config: Dict[str, Any] = DEFAULT_CONFIG) -> Pipeline:
 
 
 def get_feature_names(pipeline: Pipeline, X_sample: pd.DataFrame) -> List[str]:
+    """
+    After fitting, extract final feature names produced by the ColumnTransformer.
+
+    Usage:
+        pipe = build_pipeline(config)
+        pipe.fit(X_train, y_train)
+        names = get_feature_names(pipe, X_train.head(1))
+    """
     # Access the fitted ColumnTransformer
     ct: ColumnTransformer = pipeline.named_steps["preprocess"]
     # get_feature_names_out requires either fitted transformers or an X sample

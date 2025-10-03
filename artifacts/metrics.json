@@ -1,0 +1,45 @@
+{
+  "train_artifact": "C:\\Users\\Ryan\\Desktop\\Code\\Projects\\AntiqueFinder\\artifacts\\pipeline.joblib",
+  "metrics": {
+    "MAE": 37115.571079369714,
+    "RMSE": 72838.3376241528,
+    "R2": -0.2389676879013034
+  },
+  "n_train": 63,
+  "n_val": 8,
+  "config": {
+    "numeric_cols": [
+      "bladeLength"
+    ],
+    "single_categorical_cols": [
+      "condition",
+      "restorationStatus",
+      "completeness",
+      "era",
+      "regionCulture"
+    ],
+    "multi_categorical_cols": {
+      "material": {
+        "top_k": 15,
+        "include_other": true
+      },
+      "makerWorkshop": {
+        "top_k": 30,
+        "include_other": true
+      },
+      "provenance": {
+        "top_k": 25,
+        "include_other": true
+      }
+    },
+    "model": {
+      "type": "ridge",
+      "alphas": [
+        0.1,
+        1.0,
+        10.0,
+        100.0
+      ]
+    }
+  }
+}

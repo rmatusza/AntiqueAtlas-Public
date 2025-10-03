@@ -1,3 +1,33 @@
+"""
+explain.py — Generate human-readable explanations from a trained pipeline.
+
+What it does
+------------
+- Loads a serialized sklearn Pipeline (preprocess + TransformedTargetRegressor).
+- Extracts linear coefficients (in log-price space) aligned to final feature names.
+- Computes global importances by attribute family (|coef| * std(feature)).
+- Optionally emits per-item contribution breakdowns (log-space exact; dollar-space via toggling groups).
+- Saves:
+    - artifacts/coefficients.csv      (feature, family, coef)
+    - artifacts/importances.csv       (family, importance, percent)
+    - artifacts/item_explanations.csv (optional; baseline, contributions, prediction)
+
+Usage
+-----
+python -m src.explain \
+  --model artifacts/pipeline.joblib \
+  --data data/swords_test.parquet \
+  --coefs artifacts/coefficients.csv \
+  --importances artifacts/importances.csv \
+  --items artifacts/item_explanations.csv \
+  --max-items 200
+
+Notes
+-----
+- Coefficients live in **log(price)** space due to TransformedTargetRegressor (func=log1p).
+- Global importances use the **standard deviation of transformed features** computed on the provided data.
+- Per-item dollar contributions are computed by **group toggling** (baseline vs baseline+group) for interpretability.
+"""
 from __future__ import annotations
 
 import argparse
@@ -19,6 +49,13 @@ from .pipeline import DEFAULT_CONFIG, get_feature_names
 # ------------------------------
 
 def _family_for_feature(name: str, config: Dict[str, Any]) -> str:
+    """Map a feature name to an attribute family using config heuristics.
+
+    Rules:
+    - Multi-label: names like "material__gold" → family "material" (text before "__").
+    - OneHot single-cats: names like "condition_Excellent" → family "condition" (text before first "_").
+    - Numeric: exact column names (e.g., "bladeLength") → family equals column name.
+    """
     if "__" in name:
         return name.split("__", 1)[0]
     if "_" in name:
@@ -27,6 +64,10 @@ def _family_for_feature(name: str, config: Dict[str, Any]) -> str:
 
 
 def _linear_bits(pipeline: Pipeline) -> Tuple[np.ndarray, float]:
+    """Return (coef_vector, intercept) from TransformedTargetRegressor's inner regressor.
+
+    Coefficients are in **log-price** space.
+    """
     # Pipeline: ('preprocess', ColumnTransformer) -> ('model', TransformedTargetRegressor)
     ttr = pipeline.named_steps["model"]
     reg = ttr.regressor_
@@ -39,6 +80,7 @@ def _linear_bits(pipeline: Pipeline) -> Tuple[np.ndarray, float]:
 
 
 def _transform_features(pipeline: Pipeline, X: pd.DataFrame) -> np.ndarray:
+    """Apply the fitted ColumnTransformer to X and return the final feature matrix."""
     ct: ColumnTransformer = pipeline.named_steps["preprocess"]
     return ct.transform(X)
 
@@ -88,6 +130,12 @@ def _predict_dollars(pipeline: Pipeline, X: pd.DataFrame) -> np.ndarray:
 
 
 def _toggle_group_delta(pipeline: Pipeline, row: pd.Series, family: str, feature_names: List[str], config: Dict[str, Any]) -> float:
+    """Dollar-space delta for one family:
+    - Predict baseline with the family's features turned OFF for this row.
+    - Predict with family's features ON (original values).
+    - Return difference (dollars).
+    Note: Only works for additive-on/off style features cleanly (dummies & scaled numerics). For numerics, we set to 0 baseline.
+    """
     # Build a one-row DataFrame
     X0 = row.to_frame().T.copy()
     X1 = row.to_frame().T.copy()
@@ -117,6 +165,10 @@ def per_item_explanations(
     feature_names: List[str],
     max_items: int = 100,
 ) -> pd.DataFrame:
+    """Produce a per-item breakdown in dollars by toggling families one at a time.
+
+    Columns: [predicted_price, family:delta, ... , baseline (approx), id (optional if present)]
+    """
     fam_map = _group_map(feature_names, config)
     families = sorted(fam_map.keys())
 

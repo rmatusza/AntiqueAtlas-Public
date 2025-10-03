@@ -42,7 +42,7 @@ async function countRemaining(conn, searchId, cursor, direction) {
             `SELECT COUNT(*) AS c
        FROM processed_items
        WHERE search_id = ? AND processed_item_id > ?`,
-            [searchId, cursor ?? 0] 
+            [searchId, cursor ?? 0] // if null, treat as 0 so ">" returns from start
         );
         return rows[0].c;
     }
@@ -51,10 +51,11 @@ async function countRemaining(conn, searchId, cursor, direction) {
             `SELECT COUNT(*) AS c
        FROM processed_items
        WHERE search_id = ? AND processed_item_id < ?`,
-            [searchId, cursor ?? Number.MAX_SAFE_INTEGER] 
+            [searchId, cursor ?? Number.MAX_SAFE_INTEGER] // if null, treat as +∞ so "<" returns none
         );
         return rows[0].c;
     }
+    // initial page (no cursor): remaining = total for this search
     const [rows] = await conn.query(
         `SELECT COUNT(*) AS c FROM processed_items WHERE search_id = ?`,
         [searchId]
@@ -62,25 +63,35 @@ async function countRemaining(conn, searchId, cursor, direction) {
     return rows[0].c;
 }
 
+/**
+ * Pure cursor pagination:
+ * - Pass `currPrev` = first id of current page (ASC)
+ * - Pass `currNext` = last  id of current page (ASC)
+ * - direction: '', 'next', or 'prev'
+ * - Returns only the remaining rows on the last page (e.g., 7 when 13/page and 20 total).
+ */
 export async function getPaginatedItemsByCursor(
     searchId,
     conn,
-    currPrev = null,  
-    currNext = null,   
+    currPrev = null,  // first id of CURRENT page (ASC)
+    currNext = null,   // last id  of CURRENT page (ASC)
     itemLimit,
-    direction = '',  
+    direction = '',   // '', 'next', 'prev'
 ) {
-    
+    // 1) How many remain for this direction?
+    //    (This lets us shrink LIMIT on the last page without using page numbers.)
     const remaining = await countRemaining(
         conn,
         searchId,
         direction === 'next' ? currNext
             : direction === 'prev' ? currPrev
                 : null,
-        direction || 'next' 
+        direction || 'next' // initial treat as 'next' from start
     );
 
     if (remaining === 0) {
+        // Nothing left in that direction
+        // Still return totalItems so UI can compute total pages if needed
         const [t] = await conn.query(
             `SELECT COUNT(*) AS c FROM processed_items WHERE search_id = ?`,
             [searchId]
@@ -99,6 +110,7 @@ export async function getPaginatedItemsByCursor(
 
     const limit = Math.min(itemLimit, remaining);
 
+    // 2) Build the SELECT for the requested direction (exclusive cursors).
     let sql, params;
 
     if (direction === 'next' && currNext != null) {
@@ -124,6 +136,7 @@ export async function getPaginatedItemsByCursor(
         params = [searchId, currPrev, limit];
 
     } else {
+        // initial page (from the beginning)
         sql = `
       SELECT pi.processed_item_id, pi.hibid_id, i.item_url, i.image_urls
       FROM processed_items pi
@@ -136,8 +149,10 @@ export async function getPaginatedItemsByCursor(
 
     const [rows] = await conn.query(sql, params);
 
+    // If prev, we selected DESC; flip back to ASC for client display
     const returnItems = direction === 'prev' ? rows.slice().reverse() : rows;
 
+    // 3) Derive cursors from actual results (never by arithmetic!)
     let newPrev = currPrev;
     let newNext = currNext;
 
@@ -146,6 +161,7 @@ export async function getPaginatedItemsByCursor(
         newNext = returnItems[returnItems.length - 1].processed_item_id;
     }
 
+    // 4) Compute total for UI
     const [t] = await conn.query(
         `SELECT COUNT(*) AS c FROM processed_items WHERE search_id = ?`,
         [searchId]
@@ -165,7 +181,10 @@ export async function getPaginatedItemsByCursor(
 export async function getPaginatedItemsByPageNumber(searchId, page, itemLimit, conn, pageIndexCache ) {
     const offset = (page - 1) * itemLimit;
 
+    // try cached startId
+    // const startId = await pageIndexCache.get(`${searchId}:${itemLimit}:${page}`);
     const startId = null
+
 
     let rows;
     if (startId) {
@@ -180,6 +199,7 @@ export async function getPaginatedItemsByPageNumber(searchId, page, itemLimit, c
         );
         rows = r;
     } else {
+        // fallback to OFFSET if index not built yet
         const [r] = await conn.query(
             `SELECT pi.processed_item_id, pi.hibid_id, i.item_url, i.image_urls
        FROM processed_items pi
@@ -192,6 +212,7 @@ export async function getPaginatedItemsByPageNumber(searchId, page, itemLimit, c
         rows = r;
     }
 
+    // derive cursors from actual data
     const firstId = rows[0]?.processed_item_id ?? null;
     const lastId = rows[rows.length - 1]?.processed_item_id ?? null;
     const [t] = await conn.query(

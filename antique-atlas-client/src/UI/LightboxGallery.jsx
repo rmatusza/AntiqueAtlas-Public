@@ -1,5 +1,23 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+/**
+ * LightboxGallery
+ *
+ * Props:
+ *  - images: Array<{ src: string; alt?: string }>
+ *  - initialIndex?: number (which image is the featured one on page load)
+ *  - className?: string (optional wrapper classes)
+ *
+ * Usage:
+ *  <LightboxGallery
+ *     images={[
+ *       { src: "https://picsum.photos/id/1015/800/600", alt: "Mountain" },
+ *       { src: "https://picsum.photos/id/1025/800/600", alt: "Dog" },
+ *       { src: "https://picsum.photos/id/1003/800/600", alt: "Bridge" },
+ *     ]}
+ *  />
+ */
+
 export function LightboxGallery({ images = [], initialIndex = 0, className = "" }) {
   const [current, setCurrent] = useState(Math.min(Math.max(initialIndex, 0), Math.max(0, images.length - 1)));
   const [isOpen, setIsOpen] = useState(false);
@@ -86,6 +104,7 @@ export function LightboxGallery({ images = [], initialIndex = 0, className = "" 
         </div>
       </div>
 
+      {/* Optional thumbnail strip */}
       {/* {urls.length > 1 && (
         <div className="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-6 md:grid-cols-8">
           {urls.map((u, idx) => (
